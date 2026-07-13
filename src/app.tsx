@@ -5,6 +5,9 @@ import { Card } from "@/components/ui/card"
 import { Footer } from "@/components/footer"
 import { UploadStep } from "@/components/steps/upload-step"
 import { TargetStep } from "@/components/steps/target-step"
+import { WorkingStep } from "@/components/steps/working-step"
+import { DoneStep } from "@/components/steps/done-step"
+import { useCompressor } from "@/hooks/use-compressor"
 import { probe, type MediaItem } from "@/lib/probe"
 import type { Settings } from "@/lib/plan"
 import { MB } from "@/lib/format"
@@ -16,6 +19,7 @@ export default function App() {
   const [items, setItems] = useState<MediaItem[]>([])
   const [probing, setProbing] = useState(false)
   const [settings, setSettings] = useState<Settings>({ targetBytes: 10 * MB, speed: "fast" })
+  const { jobs, logs, run, cancel } = useCompressor()
 
   const patchSettings = (patch: Partial<Settings>) => setSettings((s) => ({ ...s, ...patch }))
 
@@ -44,6 +48,12 @@ export default function App() {
       if (next.length === 0) setStep("upload")
       return next
     })
+  }
+
+  async function start() {
+    setStep("working")
+    const finished = await run(items, settings)
+    setStep(finished ? "done" : "target")
   }
 
   // Paste works anywhere on the page while picking files
@@ -87,10 +97,12 @@ export default function App() {
                     settings={settings}
                     onPatch={patchSettings}
                     onRemove={removeItem}
-                    onStart={() => setStep("working")}
+                    onStart={start}
                     onReset={reset}
                   />
                 )}
+                {step === "working" && <WorkingStep jobs={jobs} logs={logs} onCancel={cancel} />}
+                {step === "done" && <DoneStep jobs={jobs} onReset={reset} />}
               </motion.div>
             </AnimatePresence>
           </Card>
