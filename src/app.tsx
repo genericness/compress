@@ -4,8 +4,10 @@ import { toast } from "sonner"
 import { Card } from "@/components/ui/card"
 import { Footer } from "@/components/footer"
 import { UploadStep } from "@/components/steps/upload-step"
-import { FileSummary } from "@/components/file-summary"
+import { TargetStep } from "@/components/steps/target-step"
 import { probe, type MediaItem } from "@/lib/probe"
+import type { Settings } from "@/lib/plan"
+import { MB } from "@/lib/format"
 
 export type Step = "upload" | "target" | "working" | "done"
 
@@ -13,6 +15,14 @@ export default function App() {
   const [step, setStep] = useState<Step>("upload")
   const [items, setItems] = useState<MediaItem[]>([])
   const [probing, setProbing] = useState(false)
+  const [settings, setSettings] = useState<Settings>({ targetBytes: 10 * MB, speed: "fast" })
+
+  const patchSettings = (patch: Partial<Settings>) => setSettings((s) => ({ ...s, ...patch }))
+
+  function reset() {
+    setItems([])
+    setStep("upload")
+  }
 
   async function addFiles(files: File[]) {
     setProbing(true)
@@ -71,7 +81,16 @@ export default function App() {
                 className="p-5 sm:p-6"
               >
                 {step === "upload" && <UploadStep onFiles={addFiles} busy={probing} />}
-                {step === "target" && <FileSummary items={items} onRemove={removeItem} />}
+                {step === "target" && (
+                  <TargetStep
+                    items={items}
+                    settings={settings}
+                    onPatch={patchSettings}
+                    onRemove={removeItem}
+                    onStart={() => setStep("working")}
+                    onReset={reset}
+                  />
+                )}
               </motion.div>
             </AnimatePresence>
           </Card>
