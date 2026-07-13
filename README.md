@@ -1,32 +1,35 @@
-# React + TypeScript + Vite
+# compress
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Shrink images and videos to Discord's upload limits — entirely in your browser. Files never leave your device.
 
-Currently, two official plugins are available:
+Live at [compress.4x.rip](https://compress.4x.rip).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+![screenshot](docs/screenshot.png)
 
-## React Compiler
+## How it works
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Drop a file, pick a size (10 MB free tier by default, presets up to 500 MB Nitro), download the result. Videos come out as maximum-compatibility H.264 MP4s that embed and inline-play on Discord; images stay JPEG/PNG/WebP.
 
-## Expanding the Oxlint configuration
+- **WebCodecs first** ([mediabunny](https://mediabunny.dev)) — hardware-accelerated, fast.
+- **ffmpeg.wasm fallback** for browsers and formats WebCodecs can't handle (plus GIF→MP4 and two-pass "precise" mode) — loaded on demand.
+- **Canvas** for images — the browser's own encoders with a quality binary search.
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+No server. Cloudflare serves static files; every byte of media stays on your machine.
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## Development
+
+```sh
+bun install   # also stages the ffmpeg wasm cores into public/
+bun run dev
+bun test
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Deploy
+
+```sh
+bun run deploy   # vite build && wrangler deploy → compress.4x.rip
+```
+
+## Docs
+
+`CLAUDE.md` has the project map; `docs/agents/` covers each area (ui, state, compression, deploy) in depth.
