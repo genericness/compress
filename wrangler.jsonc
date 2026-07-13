@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "compress",
+  "compatibility_date": "2025-06-01",
+  "assets": {
+    "directory": "./dist"
+  },
+  "routes": [{ "pattern": "compress.4x.rip", "custom_domain": true }]
+}

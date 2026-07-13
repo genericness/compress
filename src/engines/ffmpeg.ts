@@ -30,7 +30,7 @@ async function load(): Promise<FFmpeg> {
   const forced = new URLSearchParams(location.search).get("ffmpeg")
   const mt = forced ? forced === "mt" : typeof SharedArrayBuffer !== "undefined" && crossOriginIsolated
   usingMT = mt
-  const dir = `${location.origin}/ffmpeg/${mt ? "mt" : "st"}`
+  const dir = `${location.origin}/ffmpeg/${__FFMPEG_CORE_VERSION__}/${mt ? "mt" : "st"}`
   await ffmpeg.load({
     coreURL: `${dir}/ffmpeg-core.js`,
     wasmURL: await inflate(`${dir}/ffmpeg-core.wasm.gz`, "application/wasm"),
