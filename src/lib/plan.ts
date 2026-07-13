@@ -25,7 +25,10 @@ export interface VideoPlan {
   height?: number
   /** set only when reducing */
   fps?: number
+  /** what we aim for (target × margin) */
   budgetBytes: number
+  /** the hard cap the user picked */
+  targetBytes: number
   twoPass: boolean
   /** the input is a GIF being converted to video */
   fromGif?: boolean
@@ -121,6 +124,7 @@ export function planVideo(item: MediaItem, settings: Settings, duration = item.d
     ...(scale < 1 && { width: even(item.width * scale), height: even(item.height * scale) }),
     ...(fps < (item.fps ?? 30) - 0.5 && { fps: Math.round(fps) }),
     budgetBytes,
+    targetBytes: settings.targetBytes,
     twoPass: speed === "precise",
     ...(item.kind === "gif" && { fromGif: true }),
   }
