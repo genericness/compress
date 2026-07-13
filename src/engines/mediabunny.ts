@@ -69,6 +69,11 @@ export async function compressWithMediabunny(item: MediaItem, plan: VideoPlan, c
 
     const onAbort = () => void conversion.cancel()
     cb.signal?.addEventListener("abort", onAbort, { once: true })
+    if (cb.signal?.aborted) {
+      // aborted before the listener attached — the event never fires
+      void conversion.cancel()
+      throwIfAborted(cb.signal)
+    }
     conversion.onProgress = (p) => cb.onProgress?.(p)
     cb.onStage?.(attempt === 1 ? "pass 1" : "pass 2")
 
