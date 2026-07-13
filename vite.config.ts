@@ -5,7 +5,10 @@ import tailwindcss from "@tailwindcss/vite"
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: { alias: { "@": "/src" } },
-  optimizeDeps: { exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"] },
+  optimizeDeps: {
+    exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"],
+    include: ["mediabunny", "@mediabunny/aac-encoder"],
+  },
   // SharedArrayBuffer for multithreaded ffmpeg.wasm — mirrors public/_headers in prod
   server: {
     headers: {
